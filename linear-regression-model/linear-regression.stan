@@ -1,20 +1,22 @@
 data {
     int<lower=0> N; // number of measurements
-    vector[N] log_minchi2; // uncertainty in best fit template
-    vector[N] z_sigma; // uncertainty in redshift
-    vector[N] median_z; // measured redshift
+    vector[N] z_sigma; // uncertainty in redshift, y
+    vector[N] median_z; // measured redshift, x
+    real<lower = 0> nu; // prior shape for sigma^2
+    real<lower = 0> lambda; // hyper-parameter for sigma
 }
 parameters {
-    real beta_0; // linear intercept
-    real beta_1; // coefficient for log_minchi2
-    real beta_2; // coefficient for z_sigma
-    real<lower=0> sigma; // normal standard deviation for normal linear distribution
+    real alpha; // linear intercept
+    real beta; // slope coefficient
+    real<lower=0> sigma2; // normal standard deviation for normal linear distribution
+}
+transformed parameters{
+  real<lower = 0> sigma;
+  sigma = sqrt(sigma2);
 }
 model {
-    beta_0 ~ normal(0, 10);
-    beta_1 ~ normal(0, 10);
-    beta_2 ~ normal(0, 10);
-    sigma ~ normal(0, 5);
-
-    median_z ~ normal(beta_0 + beta_1 * log_minchi2 + beta_2 * z_sigma, sigma);
+    sigma2 ~ inv_gamma(nu/2, nu * lambda/2);
+    alpha ~ normal(0, sigma);
+    beta ~ normal(0, sigma);
+    z_sigma ~ normal(alpha + beta * median_z, sigma);
 }
