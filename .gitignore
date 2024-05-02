@@ -1,0 +1,6 @@
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# large data files
+hierarchical-regression/data_mags_5000.csv
+hierarchical-regression/data_mags_50000.csv
