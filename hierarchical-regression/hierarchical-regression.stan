@@ -2,9 +2,8 @@ data {
     int<lower=0> N; // total number of measurements
     int<lower=0> J; // total number of groups
     int<lower=0> m; // max value of group_id
-//    vector[N] log_minchi2; // uncertainty in best fit template
-    vector[N] z_sigma; // uncertainty in redshift, y
-    vector[N] median_z; // measured redshift, x
+    vector[N] y_data; // uncertainty in redshift, y
+    vector[N] x_data; // measured redshift, x
     array[N] int<lower=0, upper=m> group_id; // assign group to an observation
     real<lower=0> a1;
     real<lower=0> b1;
@@ -27,7 +26,7 @@ transformed parameters{
     sigma = sqrt(sigma2);
     vector[N] mu;
     for(i in 1:N){
-        mu[i] = alpha[group_id[i]] + beta[group_id[i]] * median_z[i];
+        mu[i] = alpha[group_id[i]] + beta[group_id[i]] * x_data[i];
     }
 }
 model {
@@ -39,5 +38,5 @@ model {
     alpha ~ normal(alpha_bar, a1*sigma);
     beta ~ normal(beta_bar, b1*sigma);
 
-    z_sigma ~ normal(mu, sigma);
+    y_data ~ normal(mu, sigma);
 }
